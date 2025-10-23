@@ -1,6 +1,7 @@
 # Лабораторная работа 2 - Фабричный метод
 
 > **Dark Edition** | Фабричный метод
+
 ![Java](screenshots/icons8-логотип-java-coffee-cup-64.png)
 ![JavaScript](screenshots/icons8-javascript-64.png)
 ![SceneBuilder](screenshots/icons8-рабочий-64.png)
@@ -119,7 +120,7 @@
 
 ##  Ссылки на другие проекты
 
-* - Графический редактор фигур (Лаба 1)
+*    [Java Graphic Editor](https://github.com/Titan0zxc/JavaRedaktor) - Графический редактор фигур (Лаба 1)
 *    [Wood Production Management](https://github.com/Titan0zxc/wood-production-management) - Система управления деревообрабатывающим предприятием
 *    [University Schedule System](https://github.com/Titan0zxc/university-schedule-system) - Система управления расписанием вуза
 
