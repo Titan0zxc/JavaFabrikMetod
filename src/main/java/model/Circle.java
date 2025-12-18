@@ -1,14 +1,18 @@
+package model; // Важно: должен быть в пакете model
+
 import com.example.fabrichmetod.AbstrakClass;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.util.HashMap;
 import java.util.Map;
 
+// Ключевое изменение: extends AbstrakClass
 public class Circle extends AbstrakClass {
     private double radius;
 
+    // Конструктор теперь вызывает super()
     public Circle(double centerX, double centerY, double radius, Color color, boolean filled) {
-        super(centerX, centerY, color, filled);
+        super(centerX, centerY, color, filled); // Вызов конструктора родителя
         this.radius = radius;
     }
 
@@ -17,7 +21,6 @@ public class Circle extends AbstrakClass {
         gc.setStroke(color);
         gc.setFill(filled ? color : Color.TRANSPARENT);
 
-        // Рисуем круг с центром в (startX, startY)
         if (filled) {
             gc.fillOval(startX - radius, startY - radius, radius * 2, radius * 2);
         }
@@ -27,11 +30,11 @@ public class Circle extends AbstrakClass {
     @Override
     public void drawPreview(GraphicsContext gc, double currentX, double currentY) {
         double previewRadius = calculateDistance(startX, startY, currentX, currentY);
-        Color previewColor = color.deriveColor(0, 1, 1, 0.5); // Полупрозрачный
+        Color previewColor = color.deriveColor(0, 1, 1, 0.5);
 
         gc.setStroke(previewColor);
         gc.setFill(filled ? previewColor : Color.TRANSPARENT);
-        gc.setLineDashes(5); // Пунктир для предпросмотра
+        gc.setLineDashes(5);
 
         if (filled) {
             gc.fillOval(startX - previewRadius, startY - previewRadius,
@@ -39,14 +42,13 @@ public class Circle extends AbstrakClass {
         }
         gc.strokeOval(startX - previewRadius, startY - previewRadius,
                 previewRadius * 2, previewRadius * 2);
-        gc.setLineDashes(); // Сброс пунктира
+        gc.setLineDashes();
     }
 
     @Override
     public boolean contains(double x, double y) {
-        // Проверяем, находится ли точка внутри круга
-        double distance = calculateDistance(startX, startY, x, y);
-        return distance <= radius;
+        double dist = calculateDistance(startX, startY, x, y);
+        return dist <= radius;
     }
 
     @Override
@@ -66,19 +68,12 @@ public class Circle extends AbstrakClass {
         return map;
     }
 
-    // Геттеры и сеттеры
+    // Геттер и сеттер
     public double getRadius() {
         return radius;
     }
 
     public void setRadius(double radius) {
         this.radius = radius;
-    }
-
-    // Для отладки
-    @Override
-    public String toString() {
-        return String.format("Circle(center=(%.1f, %.1f), radius=%.1f, color=%s, filled=%s)",
-                startX, startY, radius, color, filled);
     }
 }

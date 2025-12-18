@@ -1,13 +1,13 @@
 package utils;
 
+
 import com.example.fabrichmetod.AbstrakClass;
+import com.example.fabrichmetod.FactoryAbstrak;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-
-import javax.sound.sampled.Line;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -21,93 +21,94 @@ public class JsonSerializer {
             .setPrettyPrinting()
             .create();
 
-    private static final String DEFAULT_FILENAME = "shapes.json";
-    private static FactoryAbstrak FactoryAbstrak;
+    /**
+     * Сохраняет фигуры в выбранный файл через диалог
+     */
+    public static void saveWithDialog(Window window, List<AbstrakClass> shapes) throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Сохранить фигуры");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON файлы", "*.json"),
+                new FileChooser.ExtensionFilter("Все файлы", "*.*")
+        );
+        fileChooser.setInitialFileName("мои_фигуры.json");
+
+        File file = fileChooser.showSaveDialog(window);
+        if (file != null) {
+            saveShapesToFile(shapes, file.getAbsolutePath());
+        }
+    }
 
     /**
-     * Сохраняет список фигур в JSON файл
+     * Загружает фигуры из выбранного файла через диалог
      */
-    public static void saveShapesToFile(List<AbstrakClass> shapes, String filename) throws IOException {
-        // Преобразуем фигуры в список Map для сериализации
-        List<Map<String, Object>> shapeMaps = new ArrayList<>();
-        for (AbstrakClass shape : shapes) {
-            shapeMaps.add(shape.toMap());
-        }
+    public static List<AbstrakClass> loadWithDialog(Window window) throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Загрузить фигуры");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON файлы", "*.json"),
+                new FileChooser.ExtensionFilter("Все файлы", "*.*")
+        );
 
-        // Сериализуем в JSON
-        String json = gson.toJson(shapeMaps);
-
-        // Записываем в файл
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(json);
-            System.out.println("Сохранено " + shapes.size() + " фигур в файл: " + filename);
+        File file = fileChooser.showOpenDialog(window);
+        if (file != null) {
+            return loadShapesFromFile(file.getAbsolutePath());
         }
+        return new ArrayList<>();
     }
 
     /**
      * Сохраняет в файл по умолчанию (shapes.json)
      */
-    public static void saveShapesToFile(List<AbstrakClass> shapes) throws IOException {
-        saveShapesToFile(shapes, DEFAULT_FILENAME);
-    }
-
-    /**
-     * Загружает список фигур из JSON файла
-     */
-    public static List<AbstrakClass> loadShapesFromFile(String filename) throws IOException {
-        // Проверяем существование файла
-        File file = new File(filename);
-        if (!file.exists()) {
-            System.out.println("Файл " + filename + " не найден. Возвращаем пустой список.");
-            return new ArrayList<>();
-        }
-
-        // Читаем JSON из файла
-        String json = new String(Files.readAllBytes(Paths.get(filename)));
-
-        // Десериализуем в список Map
-        Type listType = new TypeToken<List<Map<String, Object>>>(){}.getType();
-        List<Map<String, Object>> shapeMaps = gson.fromJson(json, listType);
-
-        // Преобразуем Map обратно в фигуры
-        List<AbstrakClass> shapes = new ArrayList<>();
-        if (shapeMaps != null) {
-            for (Map<String, Object> map : shapeMaps) {
-                try {
-                    AbstrakClass shape = FactoryAbstrak.createFromMap(map);
-                    shapes.add(shape);
-                } catch (Exception e) {
-                    System.err.println("Ошибка при создании фигуры из JSON: " + e.getMessage());
-                }
-            }
-        }
-
-        System.out.println("Загружено " + shapes.size() + " фигур из файла: " + filename);
-        return shapes;
+    public static void saveToDefaultFile(List<AbstrakClass> shapes) throws IOException {
+        saveShapesToFile(shapes, "shapes.json");
     }
 
     /**
      * Загружает из файла по умолчанию (shapes.json)
      */
-    public static List<AbstrakClass> loadShapesFromFile() throws IOException {
-        return loadShapesFromFile(DEFAULT_FILENAME);
+    public static List<AbstrakClass> loadFromDefaultFile() throws IOException {
+        return loadShapesFromFile("shapes.json");
     }
 
     /**
-     * Экспорт фигур в JSON строку (для буфера обмена или отладки)
+     * Сохраняет список фигур в указанный файл
      */
-    public static String exportShapesToString(List<AbstrakClass> shapes) {
+    private static void saveShapesToFile(List<AbstrakClass> shapes, String filename) throws IOException {
+        if (shapes == null || shapes.isEmpty()) {
+            System.out.println("⚠️ Нет фигур для сохранения");
+            return;
+        }
+
         List<Map<String, Object>> shapeMaps = new ArrayList<>();
         for (AbstrakClass shape : shapes) {
             shapeMaps.add(shape.toMap());
         }
-        return gson.toJson(shapeMaps);
+
+        String json = gson.toJson(shapeMaps);
+
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.write(json);
+            System.out.println("✅ Сохранено " + shapes.size() + " фигур в: " + filename);
+        }
     }
 
     /**
-     * Импорт фигур из JSON строки
+     * Загружает список фигур из указанного файла
      */
-    public static List<AbstrakClass> importShapesFromString(String json) {
+    private static List<AbstrakClass> loadShapesFromFile(String filename) throws IOException {
+        File file = new File(filename);
+        if (!file.exists()) {
+            System.out.println("⚠️ Файл не найден: " + filename);
+            return new ArrayList<>();
+        }
+
+        String json = new String(Files.readAllBytes(Paths.get(filename)));
+
+        if (json.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
         Type listType = new TypeToken<List<Map<String, Object>>>(){}.getType();
         List<Map<String, Object>> shapeMaps = gson.fromJson(json, listType);
 
@@ -118,38 +119,29 @@ public class JsonSerializer {
                     AbstrakClass shape = FactoryAbstrak.createFromMap(map);
                     shapes.add(shape);
                 } catch (Exception e) {
-                    System.err.println("Ошибка при импорте фигуры: " + e.getMessage());
+                    System.err.println("❌ Ошибка при загрузке фигуры: " + e.getMessage());
                 }
             }
         }
 
+        System.out.println("✅ Загружено " + shapes.size() + " фигур из: " + filename);
         return shapes;
     }
 
     /**
-     * Тестирование сериализации/десериализации
+     * Получает список всех сохраненных файлов в директории проекта
      */
-    public static void testSerialization() {
-        List<AbstrakClass> testShapes = new ArrayList<>();
-        testShapes.add(new Line(10, 10, 100, 100, javafx.scene.paint.Color.RED));
-        testShapes.add(new Circle(150, 150, 50, javafx.scene.paint.Color.BLUE, true));
-        testShapes.add(new Rectangle(200, 200, 80, 60, javafx.scene.paint.Color.GREEN, false));
+    public static List<String> getSavedFiles() {
+        List<String> files = new ArrayList<>();
+        File dir = new File(".");
 
-        try {
-            // Сохраняем
-            saveShapesToFile(testShapes, "test_shapes.json");
-            System.out.println("Тестовые фигуры сохранены");
-
-            // Загружаем
-            List<AbstrakClass> loaded = loadShapesFromFile("test_shapes.json");
-            System.out.println("Загружено фигур: " + loaded.size());
-
-            // Выводим JSON
-            String json = exportShapesToString(testShapes);
-            System.out.println("JSON:\n" + json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        File[] jsonFiles = dir.listFiles((d, name) -> name.endsWith(".json"));
+        if (jsonFiles != null) {
+            for (File file : jsonFiles) {
+                files.add(file.getName());
+            }
         }
+
+        return files;
     }
 }

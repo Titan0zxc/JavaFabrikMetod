@@ -1,11 +1,13 @@
 package com.example.fabrichmetod;
 
 import com.example.fabrichmetod.AbstrakClass;
+import com.example.fabrichmetod.FactoryAbstrak;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import utils.JsonSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +19,14 @@ public class HelloController {
     @FXML private CheckBox filledCheckbox;
     @FXML private ComboBox<FactoryAbstrak.ShapeType> shapeComboBox;
     @FXML private Spinner<Integer> sidesSpinner;
-    @FXML private ToggleGroup modeToggleGroup;
     @FXML private RadioButton drawModeRadio;
     @FXML private RadioButton moveModeRadio;
     @FXML private Button saveButton;
     @FXML private Button loadButton;
     @FXML private Button clearButton;
     @FXML private Label statusLabel;
+    @FXML private Label shapesCountLabel;
+    @FXML private Button savedFilesButton;
 
     // Состояние приложения
     private List<AbstrakClass> shapes = new ArrayList<>();
@@ -35,17 +38,14 @@ public class HelloController {
     private double startX, startY;
     private double offsetX, offsetY;
 
-    // Константы
-    private static final String SAVE_FILENAME = "shapes.json";
-    private FactoryAbstrak FactoryAbstrak;
-
     @FXML
     public void initialize() {
-        System.out.println("Контроллер инициализирован");
+        System.out.println("🚀 Контроллер инициализирован");
         setupUIComponents();
         setupEventHandlers();
         setupCanvasHandlers();
         updateStatus();
+        savedFilesButton.setOnAction(e -> showSavedFiles());
     }
 
     private void setupUIComponents() {
@@ -73,21 +73,10 @@ public class HelloController {
         // Режим по умолчанию - рисование
         drawModeRadio.setSelected(true);
 
-        // Настройка стилей кнопок
-        setupButtonStyles();
-    }
-
-    private void setupButtonStyles() {
-        saveButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
-        loadButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
-        clearButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;");
-    }
-
-    private void setupEventHandlers() {
-        // Обработчики кнопок
-        saveButton.setOnAction(e -> saveShapesToFile());
-        loadButton.setOnAction(e -> loadShapesFromFile());
-        clearButton.setOnAction(e -> clearAllShapes());
+        // Создаем ToggleGroup программно
+        ToggleGroup modeToggleGroup = new ToggleGroup();
+        drawModeRadio.setToggleGroup(modeToggleGroup);
+        moveModeRadio.setToggleGroup(modeToggleGroup);
 
         // Обработчик изменения режима
         modeToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
@@ -96,12 +85,13 @@ public class HelloController {
                 updateStatus();
             }
         });
+    }
 
-        // Обработчик изменения цвета
-        colorPicker.setOnAction(e -> updateStatus());
-
-        // Обработчик изменения заливки
-        filledCheckbox.setOnAction(e -> updateStatus());
+    private void setupEventHandlers() {
+        // Обработчики кнопок
+        saveButton.setOnAction(e -> saveShapesToFile());
+        loadButton.setOnAction(e -> loadShapesFromFile());
+        clearButton.setOnAction(e -> clearAllShapes());
     }
 
     private void setupCanvasHandlers() {
@@ -125,14 +115,14 @@ public class HelloController {
                     filledCheckbox.isSelected(),
                     sidesSpinner.getValue()
             );
-            System.out.println("Начало рисования фигуры в (" + startX + ", " + startY + ")");
+            System.out.println("🖱️ Начало рисования фигуры в (" + startX + ", " + startY + ")");
         } else {
             // Пытаемся выбрать фигуру для перемещения
             selectedShape = findShapeAt(startX, startY);
             if (selectedShape != null) {
                 offsetX = startX - selectedShape.getStartX();
                 offsetY = startY - selectedShape.getStartY();
-                System.out.println("Выбрана фигура для перемещения: " + selectedShape.getType());
+                System.out.println("↔️ Выбрана фигура для перемещения: " + selectedShape.getType());
             }
         }
     }
@@ -148,23 +138,8 @@ public class HelloController {
             previewShape.drawPreview(drawingCanvas.getGraphicsContext2D(), currentX, currentY);
         } else if (!isDrawingMode && selectedShape != null) {
             // Перемещаем выбранную фигуру
-            double newX = currentX - offsetX;
-            double newY = currentY - offsetY;
-
-            // Вычисляем смещение
-            double deltaX = newX - selectedShape.getStartX();
-            double deltaY = newY - selectedShape.getStartY();
-
-            // Обновляем позицию фигуры
-            selectedShape.setStartX(newX);
-            selectedShape.setStartY(newY);
-
-            // Особый случай для линии (нужно перемещать и конечную точку)
-            if (selectedShape instanceof Line) {
-                Line line = (Line) selectedShape;
-                line.setEndX(line.getEndX() + deltaX);
-                line.setEndY(line.getEndY() + deltaY);
-            }
+            selectedShape.setStartX(currentX - offsetX);
+            selectedShape.setStartY(currentY - offsetY);
 
             clearCanvas();
             redrawAllShapes();
@@ -194,20 +169,19 @@ public class HelloController {
                 );
 
                 shapes.add(finalShape);
-                System.out.println("Создана новая фигура: " + finalShape.getType() +
+                System.out.println("✅ Создана новая фигура: " + finalShape.getType() +
                         " (всего фигур: " + shapes.size() + ")");
             } else {
-                System.out.println("Фигура слишком маленькая, не создана");
+                System.out.println("⚠️ Фигура слишком маленькая, не создана");
             }
 
             previewShape = null;
             clearCanvas();
             redrawAllShapes();
+            updateStatus();
         } else {
             selectedShape = null;
         }
-
-        updateStatus();
     }
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
@@ -246,45 +220,86 @@ public class HelloController {
         if (statusLabel != null) {
             statusLabel.setText(status);
         }
+
+        if (shapesCountLabel != null) {
+            shapesCountLabel.setText("Всего фигур: " + shapes.size());
+        }
     }
 
     // ========== МЕТОДЫ ДЛЯ КНОПОК ==========
 
     private void saveShapesToFile() {
         try {
-            JsonSerializer.saveShapesToFile(shapes, SAVE_FILENAME);
-            showAlert("Успех",
-                    "Фигуры успешно сохранены в файл: " + SAVE_FILENAME + "\n" +
-                            "Сохранено фигур: " + shapes.size(),
+            // Сохраняем в файл по умолчанию
+            JsonSerializer.saveToDefaultFile(shapes);
+
+            // ИЛИ можно использовать диалог (раскомментировать):
+            // JsonSerializer.saveWithDialog(drawingCanvas.getScene().getWindow(), shapes);
+
+            showAlert("✅ Успех",
+                    "Фигуры сохранены в файл 'shapes.json'!\n" +
+                            "Сохранено фигур: " + shapes.size() + "\n" +
+                            "Файл находится в папке с проектом.",
                     Alert.AlertType.INFORMATION);
-            System.out.println("Фигуры сохранены в " + SAVE_FILENAME);
         } catch (IOException e) {
-            showAlert("Ошибка сохранения",
+            showAlert("❌ Ошибка сохранения",
                     "Не удалось сохранить файл:\n" + e.getMessage(),
                     Alert.AlertType.ERROR);
-            System.err.println("Ошибка при сохранении: " + e.getMessage());
         }
     }
 
     private void loadShapesFromFile() {
         try {
-            List<AbstrakClass> loadedShapes = JsonSerializer.loadShapesFromFile(SAVE_FILENAME);
-            shapes = loadedShapes;
-            clearCanvas();
-            redrawAllShapes();
+            // Загружаем из файла по умолчанию
+            List<AbstrakClass> loadedShapes = JsonSerializer.loadFromDefaultFile();
 
-            showAlert("Успех",
-                    "Фигуры успешно загружены из файла: " + SAVE_FILENAME + "\n" +
-                            "Загружено фигур: " + shapes.size(),
-                    Alert.AlertType.INFORMATION);
-            System.out.println("Фигуры загружены из " + SAVE_FILENAME);
-            updateStatus();
+            // ИЛИ можно использовать диалог (раскомментировать):
+            // List<AbstrakClass> loadedShapes = JsonSerializer.loadWithDialog(drawingCanvas.getScene().getWindow());
+
+            if (!loadedShapes.isEmpty()) {
+                shapes = loadedShapes;
+                clearCanvas();
+                redrawAllShapes();
+
+                showAlert("✅ Успех",
+                        "Фигуры загружены из файла 'shapes.json'!\n" +
+                                "Загружено фигур: " + shapes.size(),
+                        Alert.AlertType.INFORMATION);
+                updateStatus();
+            } else {
+                showAlert("ℹ️ Информация",
+                        "Файл 'shapes.json' не найден или пуст.\n" +
+                                "Сначала сохраните фигуры.",
+                        Alert.AlertType.INFORMATION);
+            }
         } catch (IOException e) {
-            showAlert("Ошибка загрузки",
-                    "Не удалось загрузить файл:\n" + e.getMessage() + "\n" +
-                            "Файл может не существовать или быть поврежден.",
+            showAlert("❌ Ошибка загрузки",
+                    "Не удалось загрузить файл:\n" + e.getMessage(),
                     Alert.AlertType.ERROR);
-            System.err.println("Ошибка при загрузке: " + e.getMessage());
+        }
+    }
+
+    /**
+     * НОВЫЙ МЕТОД: Показать список всех сохранений
+     */
+    private void showSavedFiles() {
+        List<String> savedFiles = JsonSerializer.getSavedFiles();
+
+        if (savedFiles.isEmpty()) {
+            showAlert("📁 Сохранения",
+                    "Нет сохраненных файлов.\n" +
+                            "Сначала сохраните фигуры кнопкой 'Сохранить в JSON'.",
+                    Alert.AlertType.INFORMATION);
+        } else {
+            StringBuilder filesList = new StringBuilder("Сохраненные файлы:\n\n");
+            for (String file : savedFiles) {
+                filesList.append("• ").append(file).append("\n");
+            }
+
+            showAlert("📁 Сохранения",
+                    filesList.toString() +
+                            "\nЧтобы загрузить, выберите 'shapes.json'",
+                    Alert.AlertType.INFORMATION);
         }
     }
 
@@ -298,7 +313,7 @@ public class HelloController {
             if (response == ButtonType.OK) {
                 shapes.clear();
                 clearCanvas();
-                System.out.println("Холст очищен");
+                System.out.println("🧹 Холст очищен");
                 updateStatus();
 
                 Alert info = new Alert(Alert.AlertType.INFORMATION);
@@ -310,27 +325,12 @@ public class HelloController {
         });
     }
 
-    // ========== ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ ==========
-
     private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    /**
-     * Для отладки - выводит информацию о всех фигурах
-     */
-    public void printShapesInfo() {
-        System.out.println("=== Информация о фигурах ===");
-        System.out.println("Всего фигур: " + shapes.size());
-        for (int i = 0; i < shapes.size(); i++) {
-            AbstrakClass shape = shapes.get(i);
-            System.out.printf("%d. %s - %s%n", i + 1, shape.getType(), shape);
-        }
-        System.out.println("============================");
     }
 
     // Геттеры для тестирования

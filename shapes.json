@@ -1,0 +1,27 @@
+[
+  {
+    "centerY": 367.0,
+    "color": "0xff6666ff",
+    "centerX": 386.0,
+    "filled": true,
+    "type": "CIRCLE",
+    "radius": 57.9396237474839
+  },
+  {
+    "color": "0x000000ff",
+    "x": 257.0,
+    "width": 255.0,
+    "y": 208.0,
+    "filled": true,
+    "type": "RECTANGLE",
+    "height": 86.0
+  },
+  {
+    "sideLength": 75.6042326857432,
+    "centerY": 384.0,
+    "color": "0x000000ff",
+    "centerX": 205.0,
+    "filled": true,
+    "type": "TRIANGLE"
+  }
+]

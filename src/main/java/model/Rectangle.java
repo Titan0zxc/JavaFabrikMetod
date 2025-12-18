@@ -1,3 +1,5 @@
+package model;
+
 import com.example.fabrichmetod.AbstrakClass;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -5,8 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Rectangle extends AbstrakClass {
-    private double width;
-    private double height;
+    private double width, height;
 
     public Rectangle(double x, double y, double width, double height,
                      Color color, boolean filled) {
@@ -20,7 +21,6 @@ public class Rectangle extends AbstrakClass {
         gc.setStroke(color);
         gc.setFill(filled ? color : Color.TRANSPARENT);
 
-        // Рисуем прямоугольник от точки (startX, startY)
         if (filled) {
             gc.fillRect(startX, startY, width, height);
         }
@@ -46,7 +46,6 @@ public class Rectangle extends AbstrakClass {
 
     @Override
     public boolean contains(double x, double y) {
-        // Проверяем, находится ли точка внутри прямоугольника
         boolean withinX = x >= Math.min(startX, startX + width) &&
                 x <= Math.max(startX, startX + width);
         boolean withinY = y >= Math.min(startY, startY + height) &&
@@ -72,7 +71,6 @@ public class Rectangle extends AbstrakClass {
         return map;
     }
 
-    // Геттеры и сеттеры
     public double getWidth() {
         return width;
     }
@@ -87,28 +85,5 @@ public class Rectangle extends AbstrakClass {
 
     public void setHeight(double height) {
         this.height = height;
-    }
-
-    // Для удобства - получение координат всех углов
-    public double getTopLeftX() {
-        return Math.min(startX, startX + width);
-    }
-
-    public double getTopLeftY() {
-        return Math.min(startY, startY + height);
-    }
-
-    public double getBottomRightX() {
-        return Math.max(startX, startX + width);
-    }
-
-    public double getBottomRightY() {
-        return Math.max(startY, startY + height);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Rectangle(x=%.1f, y=%.1f, width=%.1f, height=%.1f, color=%s, filled=%s)",
-                startX, startY, width, height, color, filled);
     }
 }

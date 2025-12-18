@@ -1,10 +1,8 @@
+package com.example.fabrichmetod;
+
 import com.example.fabrichmetod.AbstrakClass;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
-
-import javax.sound.sampled.Line;
+import model.*; // Импорт всех классов из папки model
 import java.util.Map;
 
 public class FactoryAbstrak {
@@ -46,7 +44,7 @@ public class FactoryAbstrak {
                 return new Line(startX, startY, endX, endY, color);
 
             case CIRCLE:
-                double radius = calculateDistance(startX, startY, endX, endY);
+                double radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
                 return new Circle(startX, startY, radius, color, filled);
 
             case RECTANGLE:
@@ -55,12 +53,12 @@ public class FactoryAbstrak {
                 return new Rectangle(startX, startY, width, height, color, filled);
 
             case TRIANGLE:
-                double triangleSize = calculateDistance(startX, startY, endX, endY);
+                double triangleSize = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
                 return new Triangle(startX, startY, triangleSize * 2, color, filled);
 
             case POLYGON:
                 int polygonSides = (sides != null && sides >= 3) ? sides : 5;
-                double polygonRadius = calculateDistance(startX, startY, endX, endY);
+                double polygonRadius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
                 return new Polygon(startX, startY, polygonSides, polygonRadius, color, filled);
 
             default:
@@ -128,33 +126,5 @@ public class FactoryAbstrak {
             default:
                 throw new IllegalArgumentException("Неизвестный тип фигуры в JSON: " + type);
         }
-    }
-
-    /**
-     * Вспомогательный метод для вычисления расстояния
-     */
-    private static double calculateDistance(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    }
-
-    /**
-     * Тестирование фабрики
-     */
-    public static void testFactory() {
-        System.out.println("=== Тестирование фабрики фигур ===");
-
-        // Создаем несколько фигур
-        AbstrakClass line = createFinalShape(ShapeType.LINE, 10, 10, 100, 100, Color.RED, false, null);
-        AbstrakClass circle = createFinalShape(ShapeType.CIRCLE, 150, 150, 200, 200, Color.BLUE, true, null);
-        AbstrakClass rect = createFinalShape(ShapeType.RECTANGLE, 200, 200, 300, 250, Color.GREEN, false, null);
-        AbstrakClass triangle = createFinalShape(ShapeType.TRIANGLE, 300, 300, 350, 350, Color.ORANGE, true, null);
-        AbstrakClass polygon = createFinalShape(ShapeType.POLYGON, 400, 400, 450, 450, Color.PURPLE, true, 6);
-
-        System.out.println("Создано фигур: 5");
-        System.out.println("Линия: " + line.getType());
-        System.out.println("Круг: " + circle.getType());
-        System.out.println("Прямоугольник: " + rect.getType());
-        System.out.println("Треугольник: " + triangle.getType());
-        System.out.println("Многоугольник: " + polygon.getType());
     }
 }

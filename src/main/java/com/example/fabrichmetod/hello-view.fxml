@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.fabrichmetod.HelloController"
+            prefWidth="1000"
+            prefHeight="700"
+            style="-fx-background-color: #f5f5f5;">
+
+    <top>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: linear-gradient(to right, #2c3e50, #4a6fa5);">
+            <Label text="Рисовалка фигур - Фабричный метод"
+                   textFill="white">
+                <font>
+                    <Font name="Arial" size="20" />
+                </font>
+                <padding>
+                    <Insets top="15" bottom="15" left="20" right="20" />
+                </padding>
+            </Label>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox spacing="15"
+              style="-fx-background-color: #e8e8e8; -fx-padding: 20; -fx-border-color: #ccc; -fx-border-width: 0 1 0 0;">
+
+            <VBox spacing="8">
+                <Label text="ТИП ФИГУРЫ:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <ComboBox fx:id="shapeComboBox"
+                          prefWidth="200"
+                          style="-fx-font-size: 14px;" />
+            </VBox>
+
+            <VBox spacing="8">
+                <Label text="КОЛИЧЕСТВО СТОРОН:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <Spinner fx:id="sidesSpinner"
+                         prefWidth="200"
+                         style="-fx-font-size: 14px;" />
+            </VBox>
+
+            <VBox spacing="8">
+                <Label text="ЦВЕТ ФИГУРЫ:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <ColorPicker fx:id="colorPicker"
+                             prefWidth="200"
+                             style="-fx-font-size: 14px;" />
+            </VBox>
+
+            <VBox spacing="8">
+                <CheckBox fx:id="filledCheckbox"
+                          text="Заливка фигуры"
+                          style="-fx-font-size: 14px; -fx-text-fill: #2c3e50;" />
+            </VBox>
+
+            <VBox spacing="8">
+                <Label text="РЕЖИМ РАБОТЫ:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <RadioButton fx:id="drawModeRadio"
+                             text="Рисование"
+                             selected="true"
+                             style="-fx-font-size: 14px;" />
+                <RadioButton fx:id="moveModeRadio"
+                             text="Перемещение"
+                             style="-fx-font-size: 14px;" />
+            </VBox>
+
+            <Separator style="-fx-padding: 10 0;" />
+
+            <VBox spacing="12">
+                <Label text="УПРАВЛЕНИЕ:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                <Button fx:id="saveButton"
+                        text="💾 Сохранить в JSON"
+                        prefWidth="200"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 5;" />
+
+                <Button fx:id="loadButton"
+                        text="📂 Загрузить из JSON"
+                        prefWidth="200"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 5;" />
+
+                <Button fx:id="savedFilesButton"
+                        text="📁 Показать сохранения"
+                        prefWidth="200"
+                        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 5;" />
+
+                <Button fx:id="clearButton"
+                        text="🗑️ Очистить холст"
+                        prefWidth="200"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 5;" />
+            </VBox>
+
+            <Separator style="-fx-padding: 10 0;" />
+
+            <VBox spacing="8">
+                <Label text="📋 ИНСТРУКЦИЯ:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <Label text="1. Выберите фигуру"
+                       style="-fx-text-fill: #555; -fx-font-size: 13px;" />
+                <Label text="2. Выберите цвет и заливку"
+                       style="-fx-text-fill: #555; -fx-font-size: 13px;" />
+                <Label text="3. Нажмите на холст и тяните"
+                       style="-fx-text-fill: #555; -fx-font-size: 13px;" />
+                <Label text="4. Сохраняйте и загружайте"
+                       style="-fx-text-fill: #555; -fx-font-size: 13px;" />
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-padding: 20 0 0 0;">
+                <Label text="ℹ️ О ПРОЕКТЕ:"
+                       style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <Label text="Лабораторная работа"
+                       style="-fx-text-fill: #555; -fx-font-size: 12px;" />
+                <Label text="Фабричный метод + JSON"
+                       style="-fx-text-fill: #555; -fx-font-size: 12px;" />
+                <Label text="Всего фигур: 0"
+                       fx:id="shapesCountLabel"
+                       style="-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 12px;" />
+            </VBox>
+
+        </VBox>
+    </left>
+
+    <center>
+        <Canvas fx:id="drawingCanvas"
+                width="700"
+                height="600"
+                style="-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" />
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT"
+              style="-fx-background-color: #34495e; -fx-padding: 8 20;">
+            <Label fx:id="statusLabel"
+                   text="Готов к работе | Режим: Рисование | Фигура: Прямоугольник"
+                   textFill="white"
+                   style="-fx-font-size: 13px;" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

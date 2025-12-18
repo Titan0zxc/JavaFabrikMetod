@@ -1,3 +1,6 @@
+package model;
+
+
 import com.example.fabrichmetod.AbstrakClass;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -32,7 +35,7 @@ public class Line extends AbstrakClass {
     @Override
     public boolean contains(double x, double y) {
         double distance = pointToLineDistance(x, y, startX, startY, endX, endY);
-        return distance < 5;
+        return distance < 5; // Порог 5 пикселей
     }
 
     private double pointToLineDistance(double px, double py,
@@ -62,7 +65,9 @@ public class Line extends AbstrakClass {
     }
 
     @Override
-    public String getType() { return "LINE"; }
+    public String getType() {
+        return "LINE";
+    }
 
     @Override
     public Map<String, Object> toMap() {
@@ -76,9 +81,19 @@ public class Line extends AbstrakClass {
         return map;
     }
 
-    public double getEndX() { return endX; }
-    public void setEndX(double endX) { this.endX = endX; }
+    public double getEndX() {
+        return endX;
+    }
 
-    public double getEndY() { return endY; }
-    public void setEndY(double endY) { this.endY = endY; }
+    public void setEndX(double endX) {
+        this.endX = endX;
+    }
+
+    public double getEndY() {
+        return endY;
+    }
+
+    public void setEndY(double endY) {
+        this.endY = endY;
+    }
 }
